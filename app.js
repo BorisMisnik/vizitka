@@ -23,6 +23,9 @@ new CronJob('* * * * *', function(){
 			async.each(cards, function (item, callback){
 				var base64Data = item.get('dataimg').replace(/^data:image\/png;base64,/,"");
 				var id = item.id;
+				var email = item.get('type');
+
+				if( !validateEmail (email) ) return;
 
 				var name = randomName();
 				var html = '';
@@ -46,7 +49,7 @@ new CronJob('* * * * *', function(){
 
 				message.attachments.push(imageToEmail);
 				message.to.push({
-					"email" : item.get('type')
+					"email" : email
 				});
 				mandrill_client.messages.send({
 					"message": message, 
@@ -62,6 +65,7 @@ new CronJob('* * * * *', function(){
 								error : function ( err ){
 									console.log( 'Parse update error' );
 									console.log( err );
+									callback ( 'Parse update error' );
 								}
 							});
 						}
@@ -96,6 +100,11 @@ function randomName(){
 		i--;
 	}
 	return result + '.png';
+};
+
+function validateEmail(email) { 
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
 };
 
 var port = Number(process.env.PORT || 5000);
