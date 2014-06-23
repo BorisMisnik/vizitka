@@ -17,12 +17,12 @@ var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
 query.equalTo('send', false);
 
-new CronJob('* * * * *', function(){
 	query.find({
 		success: function(cards) {
 			async.each(cards, function (item, callback){
 				var base64Data = item.get('dataimg').replace(/^data:image\/png;base64,/,"");
 				var id = item.id;
+				// console.log( id )
 				var email = item.get('type');
 
 				if( !validateEmail (email) ) return;
@@ -61,6 +61,7 @@ new CronJob('* * * * *', function(){
 									email.set("send", true);
 									email.save();
 									callback( null );
+									console.log( 'Email sent' );
 								},
 								error : function ( err ){
 									console.log( 'Parse update error' );
@@ -78,7 +79,6 @@ new CronJob('* * * * *', function(){
 			},
 			function (err){
 				if( err ) return console.log( err );
-				console.log( 'Email sent' );
 			});
 		},
 		error : function ( err ){
@@ -86,7 +86,6 @@ new CronJob('* * * * *', function(){
 			console.log( err );
 		}
 	});
-}, null, true, "America/Los_Angeles");
 
 
 
@@ -107,7 +106,3 @@ function validateEmail(email) {
     return re.test(email);
 };
 
-var port = Number(process.env.PORT || 5000);
-app.listen(port, function() {
-  console.log("Listening on " + port);
-});
