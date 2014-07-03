@@ -21,61 +21,73 @@ query.equalTo('send', false);
 		success: function(cards) {
 			async.each(cards, function (item, callback){
 				var base64Data = item.get('dataimg').replace(/^data:image\/png;base64,/,"");
+				var fon = item.get('fon');
 				var id = item.id;
-				// console.log( id )
+				var fonBase64 = '';
+
 				var email = item.get('type');
 
 				if( !validateEmail (email) ) return;
 
-				var name = randomName();
 				var html = '';
 				html += '<h1>Привіт!</h1>'
 				html += '<p>Підкреслюй свій стиль за допомогою персональної візитки у додатку.<br/><br/>Приємного дня!</p>';
 
-				var imageToEmail = {
-					type: 'image/png',
-					name: name,
-					content : base64Data
-				};
 
-				var message = {
-					"html": html,
-					"subject": "Твоя візитка готова!",
-					"from_email": "rothmans@com.ua",
-					"from_name": "Rothmans",
-					"to": [],
-					"attachments" : []
-				};
+				fs.readFile(fon, 'binary', function(err, fon){
+					if( err ) return console.log( err );
+					fonBase64 = new Buffer(fon, 'binary').toString('base64');
+					var imageToEmail = {
+						type: 'image/png',
+						name: 'FRONT.png',
+						content : base64Data
+					};
+					var fon = {
+						type: 'image/png',
+						name: 'BACK.png',
+						content : fonBase64
+					}
 
-				message.attachments.push(imageToEmail);
-				message.to.push({
-					"email" : email
-				});
-				mandrill_client.messages.send({
-					"message": message, 
-					"async": false, 
-					"ip_pool": "Main Pool"}, function(result) {
-						if( result[0].status === 'queued' || result[0].status === 'sent' ){
-							query.get(id, {
-								success: function(email) {
-									email.set("send", true);
-									email.save();
-									callback( null );
-									console.log( 'Email sent' );
-								},
-								error : function ( err ){
-									console.log( 'Parse update error' );
-									console.log( err );
-									callback ( 'Parse update error' );
-								}
-							});
-						}
-						else{
-							callback( 'ERROR ' + item.get('type') );
-						}
-				}, function(e) {
-					callback( 'A mandrill error occurred: ' + e.name + ' - ' + e.message )
-				});
+					var message = {
+						"html": html,
+						"subject": "Твоя візитка готова!",
+						"from_email": "rothmans@com.ua",
+						"from_name": "Rothmans",
+						"to": [],
+						"attachments" : []
+					};
+
+					message.attachments.push(imageToEmail);
+					message.attachments.push(fon);
+					message.to.push({
+						"email" : email
+					});
+					mandrill_client.messages.send({
+						"message": message, 
+						"async": false, 
+						"ip_pool": "Main Pool"}, function(result) {
+							if( result[0].status === 'queued' || result[0].status === 'sent' ){
+								query.get(id, {
+									success: function(email) {
+										email.set("send", true);
+										email.save();
+										callback( null );
+										console.log( 'Email sent' );
+									},
+									error : function ( err ){
+										console.log( 'Parse update error' );
+										console.log( err );
+										callback ( 'Parse update error' );
+									}
+								});
+							}
+							else{
+								callback( 'ERROR ' + item.get('type') );
+							}
+					}, function(e) {
+						callback( 'A mandrill error occurred: ' + e.name + ' - ' + e.message )
+					});
+				})	
 			},
 			function (err){
 				if( err ) return console.log( err );
