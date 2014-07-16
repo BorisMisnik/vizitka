@@ -50,7 +50,6 @@ query.equalTo('send', false);
 
 				message.attachments.push(imageToEmail);
 				message.to.push({"email" : email});
-
 				if( !fon ){
 					sendEmail ();
 				}
