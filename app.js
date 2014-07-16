@@ -33,7 +33,7 @@ query.equalTo('send', false);
 				html += '<h1>Привіт!</h1>'
 				html += '<p>Підкреслюй свій стиль за допомогою персональної візитки у додатку.<br/><br/>Приємного дня!</p>';
 
-
+				if( !fon ) return;
 				fs.readFile(fon, 'binary', function(err, fon){
 					if( err ) return console.log( err );
 					fonBase64 = new Buffer(fon, 'binary').toString('base64');
