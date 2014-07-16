@@ -16,6 +16,7 @@ Parse.initialize(APP_ID, JS_KEY);
 var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
 var job = new CronJob ('* * * * *', function (){
+console.log('run job')
 	var message = {
 					"html": 'Hello',
 					"subject": "Твоя візитка готова!",
@@ -50,7 +51,7 @@ fs.readFile('/img/ctmp1.png', 'binary', function(err, fon){
 
 })
 
-
+job.start();
 
 query.equalTo('send', false);
 	query.find({
