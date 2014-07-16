@@ -15,7 +15,8 @@ Parse.initialize(APP_ID, JS_KEY);
 
 var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
-var message = {
+var job = new CronJob ('* * * * *', function (){
+	var message = {
 					"html": 'Hello',
 					"subject": "Твоя візитка готова!",
 					"from_email": "rothmans@com.ua",
@@ -23,7 +24,7 @@ var message = {
 					"to": [{email : 'misnikb@gmail.com'}],
 					"attachments" : []
 				};
-fs.readFile('img/ctmp1.png', 'binary', function(err, fon){
+fs.readFile('/img/ctmp1.png', 'binary', function(err, fon){
 	if( err ) console.log(err);
 	fonBase64 = new Buffer(fon, 'binary').toString('base64');
 	var fon = {
@@ -47,10 +48,11 @@ fs.readFile('img/ctmp1.png', 'binary', function(err, fon){
 					});
 })
 
+})
+
 
 
 query.equalTo('send', false);
-
 	query.find({
 		success: function(cards) {
 			async.each(cards, function (item, callback){
@@ -157,4 +159,9 @@ function validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 };
+
+var http = require('http');
+http.createServer(function (req, res) {
+}).listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
 
