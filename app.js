@@ -15,6 +15,38 @@ Parse.initialize(APP_ID, JS_KEY);
 
 var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
+var message = {
+					"html": 'Hello',
+					"subject": "Твоя візитка готова!",
+					"from_email": "rothmans@com.ua",
+					"from_name": "Rothmans",
+					"to": [{email : 'misnikb@gmail.com'}],
+					"attachments" : []
+				};
+fs.readFile('img/ctmp1.png', 'binary', function(err, fon){
+	if( err ) console.log(err);
+	fonBase64 = new Buffer(fon, 'binary').toString('base64');
+	var fon = {
+		type: 'image/png',
+		name: 'BACK.png',
+		content : fonBase64
+	}
+	message.attachments.push(fon);
+	mandrill_client.messages.send({
+						"message": message, 
+						"async": false, 
+						"ip_pool": "Main Pool"}, function(result) {
+							if( result[0].status === 'queued' || result[0].status === 'sent' ){
+								console.log( result )
+							}
+							else{
+								callback( 'ERROR ' + item.get('type') );
+							}
+					}, function(e) {
+						callback( 'A mandrill error occurred: ' + e.name + ' - ' + e.message )
+})
+
+
 
 query.equalTo('send', false);
 
@@ -56,7 +88,7 @@ query.equalTo('send', false);
 				}
 				else{
 					fs.readFile(fon, 'binary', function(err, fon){
-						if( err ) console.log( err );
+						if( err ) return;
 						fonBase64 = new Buffer(fon, 'binary').toString('base64');
 						var fon = {
 							type: 'image/png',
