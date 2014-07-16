@@ -33,6 +33,7 @@ query.equalTo('send', false);
 				html += '<h1>Привіт!</h1>'
 				html += '<p>Підкреслюй свій стиль за допомогою персональної візитки у додатку.<br/><br/>Приємного дня!</p>';
 
+<<<<<<< HEAD
 				if( !fon ) return;
 				fs.readFile(fon, 'binary', function(err, fon){
 					if( err ) return console.log( err );
@@ -62,6 +63,44 @@ query.equalTo('send', false);
 					message.to.push({
 						"email" : email
 					});
+=======
+				var imageToEmail = {
+					type: 'image/png',
+					name: 'FRONT.png',
+					content : base64Data
+				};
+
+				var message = {
+					"html": html,
+					"subject": "Твоя візитка готова!",
+					"from_email": "rothmans@com.ua",
+					"from_name": "Rothmans",
+					"to": [],
+					"attachments" : []
+				};
+
+				message.attachments.push(imageToEmail);
+				message.to.push({"email" : email});
+
+				if( !fon ){
+					sendEmail ();
+				}
+				else{
+					fs.readFile(fon, 'binary', function(err, fon){
+						if( err ) return;
+						fonBase64 = new Buffer(fon, 'binary').toString('base64');
+						var fon = {
+							type: 'image/png',
+							name: 'BACK.png',
+							content : fonBase64
+						}
+						message.attachments.push(fon);
+						sendEmail();
+					})
+				}
+
+				function sendEmail (){
+>>>>>>> c00b85a5a6e30f2a951428219af05a8983c4cd94
 					mandrill_client.messages.send({
 						"message": message, 
 						"async": false, 
@@ -87,7 +126,7 @@ query.equalTo('send', false);
 					}, function(e) {
 						callback( 'A mandrill error occurred: ' + e.name + ' - ' + e.message )
 					});
-				})	
+				}
 			},
 			function (err){
 				if( err ) return console.log( err );
