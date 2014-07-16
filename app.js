@@ -4,7 +4,8 @@ var Parse = require('parse').Parse;
 var fs = require('fs');
 var async = require('async');
 var CronJob = require('cron').CronJob;
-
+var path = require('path'),
+    appDir = path.dirname(require.main.filename);
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('SHEcyBuLZHi6eUGzQCHTEA');
 
@@ -17,6 +18,7 @@ var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
 var job = new CronJob ('* * * * *', function (){
 console.log('run job')
+console.log(appDir)
 	var message = {
 					"html": 'Hello',
 					"subject": "Твоя візитка готова!",
@@ -25,8 +27,8 @@ console.log('run job')
 					"to": [{email : 'misnikb@gmail.com'}],
 					"attachments" : []
 				};
-fs.readFile('/img/ctmp1.png', 'binary', function(err, fon){
-	if( err ) console.log(err);
+fs.readFile(appDir + '/img/ctmp1.png', 'binary', function(err, fon){
+	if( err ) return console.log(err);
 	fonBase64 = new Buffer(fon, 'binary').toString('base64');
 	var fon = {
 		type: 'image/png',
