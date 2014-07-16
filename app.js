@@ -44,6 +44,7 @@ fs.readFile('img/ctmp1.png', 'binary', function(err, fon){
 							}
 					}, function(e) {
 						callback( 'A mandrill error occurred: ' + e.name + ' - ' + e.message )
+					});
 })
 
 
