@@ -17,47 +17,11 @@ Parse.initialize(APP_ID, JS_KEY);
 var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
 var job = new CronJob ('* * * * *', function (){
-console.log('run job')
-console.log(appDir)
-	var message = {
-					"html": 'Hello',
-					"subject": "Твоя візитка готова!",
-					"from_email": "rothmans@com.ua",
-					"from_name": "Rothmans",
-					"to": [{email : 'misnikb@gmail.com'}],
-					"attachments" : []
-				};
-fs.readFile(appDir + '/img/ctmp1.png', 'binary', function(err, fon){
-	if( err ) return console.log(err);
-	fonBase64 = new Buffer(fon, 'binary').toString('base64');
-	var fon = {
-		type: 'image/png',
-		name: 'BACK.png',
-		content : fonBase64
-	}
-	message.attachments.push(fon);
-	mandrill_client.messages.send({
-						"message": message, 
-						"async": false, 
-						"ip_pool": "Main Pool"}, function(result) {
-							if( result[0].status === 'queued' || result[0].status === 'sent' ){
-								console.log( result )
-							}
-							else{
-								callback( 'ERROR ' + item.get('type') );
-							}
-					}, function(e) {
-						callback( 'A mandrill error occurred: ' + e.name + ' - ' + e.message )
-					});
-})
-
-})
-
-job.start();
-
-query.equalTo('send', false);
+	console.log( 'run job' )
+	query.equalTo('send', false);
 	query.find({
 		success: function(cards) {
+			console.log( cards.length )
 			async.each(cards, function (item, callback){
 				var base64Data = item.get('dataimg').replace(/^data:image\/png;base64,/,"");
 				var fon = item.get('fon');
@@ -93,8 +57,10 @@ query.equalTo('send', false);
 					sendEmail ();
 				}
 				else{
-					fs.readFile(fon, 'binary', function(err, fon){
-						if( err ) return;
+					var img = path.join(appDir, fon);
+					console.log( img );
+					fs.readFile(img, 'binary', function(err, fon){
+						if( err ) return console.log( err );
 						fonBase64 = new Buffer(fon, 'binary').toString('base64');
 						var fon = {
 							type: 'image/png',
@@ -143,9 +109,9 @@ query.equalTo('send', false);
 			console.log( err );
 		}
 	});
+})
 
-
-
+job.start();
 function randomName(){
 	var str = '12345677890qwertyuioplkjhgfdsazxcvbnm';
 	var result = '';
