@@ -16,7 +16,7 @@ Parse.initialize(APP_ID, JS_KEY);
 
 var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
-var job = new CronJob ('* * * * *', function (){
+var job = new CronJob ('*/15 * * * *', function (){
 	console.log( 'run job' )
 	query.equalTo('send', false);
 	query.find({
@@ -29,7 +29,7 @@ var job = new CronJob ('* * * * *', function (){
 				var fonBase64 = '';
 
 				var email = item.get('type');
-
+				console.log('email', email)
 				if( !validateEmail (email) ) return;
 
 				var html = '';
