@@ -16,6 +16,7 @@ Parse.initialize(APP_ID, JS_KEY);
 
 var BCard = Parse.Object.extend('BCard');
 var query = new Parse.Query(BCard);
+
 var job = new CronJob ('*/15 * * * *', function (){
 	console.log( 'run job' )
 	query.equalTo('send', false);
@@ -28,10 +29,10 @@ var job = new CronJob ('*/15 * * * *', function (){
 				var id = item.id;
 				var fonBase64 = '';
 
-				var email = item.get('type');
-				console.log('email', email)
-				if( !validateEmail (email) ) return;
-
+				var email = item.get('type')
+				if( email )
+						email.replce('/ /g', '');
+					
 				var html = '';
 				html += '<h1>Привіт!</h1>'
 				html += '<p>Підкреслюй свій стиль за допомогою персональної візитки у додатку.<br/><br/>Приємного дня!</p>';
@@ -58,7 +59,6 @@ var job = new CronJob ('*/15 * * * *', function (){
 				}
 				else{
 					var img = path.join(appDir, fon);
-					console.log( img );
 					fs.readFile(img, 'binary', function(err, fon){
 						if( err ) return console.log( err );
 						fonBase64 = new Buffer(fon, 'binary').toString('base64');
